@@ -1,0 +1,31 @@
+name: Build exe
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install customtkinter pyinstaller
+
+      - name: Find script
+        shell: pwsh
+        run: |
+          $f = Get-ChildItem -Filter *.py -File | Where-Object { $_.Name -like "*weexxyy*" -or $_.Name -like "*wexxyy*" } | Select-Object -First 1
+          if (-not $f) { $f = Get-ChildItem -Filter *.py
